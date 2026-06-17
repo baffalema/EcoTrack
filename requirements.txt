@@ -40,3 +40,7 @@ folium
 streamlit-folium
 reportlab
 PyJWT
+```text
+streamlit
+pandas
+python-dateutil
