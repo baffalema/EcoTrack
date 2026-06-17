@@ -1,0 +1,14 @@
+species_name,category,botanical_name,wood_density,growth_factor
+Neem (Darbejiya),Windbreakers & Shelterbelts,Azadirachta indica,0.68,0.025
+Eucalyptus,Windbreakers & Shelterbelts,Eucalyptus camaldulensis,0.72,0.035
+Desert Date (Adua),Windbreakers & Shelterbelts,Balanites aegyptiaca,0.75,0.019
+Moringa (Zogale),Economic & Agroforestry,Moringa oleifera,0.35,0.045
+Date Palm (Dabinọ),Economic & Agroforestry,Phoenix dactylifera,0.42,0.018
+Gum Arabic (Karo),Economic & Agroforestry,Acacia senegal,0.70,0.022
+Mango (Mangwaro),Economic & Agroforestry,Mangifera indica,0.60,0.025
+Cashew,Economic & Agroforestry,Anacardium occidentale,0.55,0.022
+Faidherbia (Gawo),Soil Restoration & Nitrogen-Fixing,Faidherbia albida,0.58,0.026
+Pigeon Pea,Soil Restoration & Nitrogen-Fixing,Cajanus cajan,0.40,0.015
+Flame of the Forest,Adornment & Amenity Landscape,Delonix regia,0.45,0.020
+Bougainvillea,Adornment & Amenity Landscape,Bougainvillea spectabilis,0.38,0.012
+Hibiscus,Adornment & Amenity Landscape,Hibiscus rosa-sinensis,0.30,0.010
