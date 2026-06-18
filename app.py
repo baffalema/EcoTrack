@@ -113,9 +113,9 @@ def setup_application_tables():
     cursor.execute("SELECT COUNT(*) FROM accounts")
     if cursor.fetchone()[0] == 0:
         sample_profiles = [
-            ("Katsina Premium Academy", "Private School", "Enterprise Tier"),
-            ("Batagarawa Community School", "Public School", "Basic Tier"),
-            ("Save The Green Foundation", "NGO", "Growth Tier"),
+            ("Goverment Girls College Senior Katsina", "Public school", "Basic Tier"),
+            ("Goverment Day Senior Secondary School Kofar Yandaka Katsina", "Public School", "Basic Tier"),
+            ("Stand-up Initiative For Sustainable Development", "NGO", "Growth Tier"),
             ("Dutsin-Ma Green Champions", "NGO", "Climate-Smart Academy")
         ]
         cursor.executemany("INSERT INTO accounts (name, type, tier) VALUES (?, ?, ?)", sample_profiles)
