@@ -1,14 +1,31 @@
-species_name,category,botanical_name,wood_density,growth_factor
-Neem (Darbejiya),Windbreakers & Shelterbelts,Azadirachta indica,0.68,0.025
-Eucalyptus,Windbreakers & Shelterbelts,Eucalyptus camaldulensis,0.72,0.035
-Desert Date (Adua),Windbreakers & Shelterbelts,Balanites aegyptiaca,0.75,0.019
-Moringa (Zogale),Economic & Agroforestry,Moringa oleifera,0.35,0.045
-Date Palm (Dabinọ),Economic & Agroforestry,Phoenix dactylifera,0.42,0.018
-Gum Arabic (Karo),Economic & Agroforestry,Acacia senegal,0.70,0.022
-Mango (Mangwaro),Economic & Agroforestry,Mangifera indica,0.60,0.025
-Cashew,Economic & Agroforestry,Anacardium occidentale,0.55,0.022
-Faidherbia (Gawo),Soil Restoration & Nitrogen-Fixing,Faidherbia albida,0.58,0.026
-Pigeon Pea,Soil Restoration & Nitrogen-Fixing,Cajanus cajan,0.40,0.015
-Flame of the Forest,Adornment & Amenity Landscape,Delonix regia,0.45,0.020
-Bougainvillea,Adornment & Amenity Landscape,Bougainvillea spectabilis,0.38,0.012
-Hibiscus,Adornment & Amenity Landscape,Hibiscus rosa-sinensis,0.30,0.010
+species_name,botanical_name,wood_density,growth_factor,category
+Neem (Darbejiya),Azadirachta indica,0.68,0.025,Windbreaker & Desertification
+Acacia (Gabaruwa),Acacia nilotica,0.8,0.022,Windbreaker & Desertification
+Eucalyptus (Turare),Eucalyptus camaldulensis,0.55,0.04,Windbreaker & Desertification
+Date Palm (Dabino),Phoenix dactylifera,0.9,0.018,Fruit & Economic
+Baobab (Kuka),Adansonia digitata,0.3,0.015,Native Hardwood
+Mango (Mangwaro),Mangifera indica,0.52,0.03,Fruit & Economic
+Cashew (Yazawa),Anacardium occidentale,0.5,0.028,Fruit & Economic
+Moringa (Zogale),Moringa oleifera,0.3,0.05,Medicinal & Nutrition
+Shea (Kadanya),Vitellaria paradoxa,0.66,0.016,Fruit & Economic
+Tamarind (Tsamiya),Tamarindus indica,0.83,0.018,Native Hardwood
+Mahogany (Madaci),Khaya senegalensis,0.67,0.022,Native Hardwood
+Locust Bean (Dorawa),Parkia biglobosa,0.61,0.02,Fruit & Economic
+Gum Arabic (Dakwara),Senegalia senegal,0.78,0.02,Windbreaker & Desertification
+Silk Cotton (Rimi),Ceiba pentandra,0.32,0.035,Shade & Avenue
+Flamboyant (Maliya),Delonix regia,0.45,0.032,Shade & Avenue
+African Birch (Kuka-kuka),Anogeissus leiocarpa,0.84,0.018,Native Hardwood
+Desert Date (Aduwa),Balanites aegyptiaca,0.85,0.016,Windbreaker & Desertification
+Guava (Goba),Psidium guajava,0.66,0.03,Fruit & Economic
+Lemon (Lemu),Citrus limon,0.62,0.028,Fruit & Economic
+Orange (Lemu Zaki),Citrus sinensis,0.62,0.027,Fruit & Economic
+Teak (Tiik),Tectona grandis,0.65,0.035,Native Hardwood
+Gmelina (Melina),Gmelina arborea,0.42,0.045,Native Hardwood
+Cassia (Rumfar Kasa),Senna siamea,0.6,0.03,Shade & Avenue
+Leucaena (Lukina),Leucaena leucocephala,0.54,0.04,Nitrogen-Fixing & Soil
+Pigeon Pea (Waken Turawa),Cajanus cajan,0.4,0.045,Nitrogen-Fixing & Soil
+African Locust (Runhu),Prosopis africana,0.85,0.017,Windbreaker & Desertification
+Winterthorn (Gawo),Faidherbia albida,0.58,0.02,Nitrogen-Fixing & Soil
+Henna (Lalle),Lawsonia inermis,0.7,0.025,Medicinal & Nutrition
+Tropical Almond (Furen Sanda),Terminalia catappa,0.53,0.03,Shade & Avenue
+Bamboo (Gora),Bambusa vulgaris,0.6,0.05,Windbreaker & Desertification

@@ -96,9 +96,14 @@ def setup_application_tables():
             institution_type TEXT,
             home_state TEXT,
             home_lga TEXT,
+            is_active INTEGER NOT NULL DEFAULT 1,
             created_at TEXT NOT NULL
         )
     """)
+    # safe migration for databases created before is_active existed
+    cols = [r[1] for r in cur.execute("PRAGMA table_info(users)").fetchall()]
+    if "is_active" not in cols:
+        cur.execute("ALTER TABLE users ADD COLUMN is_active INTEGER NOT NULL DEFAULT 1")
 
     cur.execute("""
         CREATE TABLE IF NOT EXISTS events (
@@ -191,16 +196,52 @@ def authenticate(username, password):
     conn = get_connection()
     row = conn.execute(
         "SELECT username,email,full_name,password_hash,password_salt,role,"
-        "institution_name,home_state,home_lga "
+        "institution_name,home_state,home_lga,is_active "
         "FROM users WHERE username=?", (username,)).fetchone()
     conn.close()
     if not row:
         return None
+    if not row[9]:                      # deactivated account
+        return "DISABLED"
     if verify_password(password, row[4], row[3]):
         return {"username": row[0], "email": row[1], "full_name": row[2],
                 "role": row[5], "institution_name": row[6],
                 "home_state": row[7], "home_lga": row[8]}
     return None
+
+# ---- admin / self-service account management --------------------------------
+def list_users():
+    conn = get_connection()
+    df = pd.read_sql_query(
+        "SELECT username,full_name,email,role,institution_name,home_state,"
+        "home_lga,is_active,created_at FROM users ORDER BY created_at", conn)
+    conn.close()
+    return df
+
+def set_user_role(username, role):
+    conn = get_connection()
+    conn.execute("UPDATE users SET role=? WHERE username=?", (role, username))
+    conn.commit(); conn.close()
+
+def set_user_active(username, active):
+    conn = get_connection()
+    conn.execute("UPDATE users SET is_active=? WHERE username=?", (1 if active else 0, username))
+    conn.commit(); conn.close()
+
+def admin_reset_password(username, new_password):
+    salt, ph = hash_password(new_password)
+    conn = get_connection()
+    conn.execute("UPDATE users SET password_hash=?, password_salt=? WHERE username=?",
+                 (ph, salt, username))
+    conn.commit(); conn.close()
+
+def change_own_password(username, old_password, new_password):
+    if not isinstance(authenticate(username, old_password), dict):
+        return False, "Your current password is incorrect."
+    if len(new_password) < 6:
+        return False, "New password must be at least 6 characters."
+    admin_reset_password(username, new_password)
+    return True, "Password updated successfully."
 
 
 # ==============================================================================
@@ -325,9 +366,11 @@ def login_screen():
             p = st.text_input("Password", type="password")
             if st.form_submit_button("Log In"):
                 user = authenticate(u.strip(), p)
-                if user:
+                if isinstance(user, dict):
                     st.session_state.auth_user = user
                     st.rerun()
+                elif user == "DISABLED":
+                    st.error("This account has been deactivated. Contact an administrator.")
                 else:
                     st.error("Invalid username or password.")
         st.caption("First time here? Use the **Register** tab to create your account.")
@@ -387,12 +430,16 @@ with st.sidebar:
         st.session_state.auth_user = None
         st.rerun()
     st.divider()
-    active_screen = st.radio("Navigate to:", [
+    nav_options = [
         "1. Record Planting",
         "2. Inspections & Audits",
         "3. Live Green Dashboard",
         "4. Leaderboards",
-    ])
+        "5. My Account",
+    ]
+    if USER["role"] == "Admin":
+        nav_options.append("6. Admin Console")
+    active_screen = st.radio("Navigate to:", nav_options)
 
 
 # ==============================================================================
@@ -632,3 +679,93 @@ elif active_screen == "4. Leaderboards":
         lb = lb.sort_values("Impact Score", ascending=False).reset_index(drop=True)
         lb.index += 1
         st.dataframe(lb.rename(columns={group_col: view}), use_container_width=True)
+
+
+# ==============================================================================
+# SCREEN 5: MY ACCOUNT (everyone — change your own password)
+# ==============================================================================
+elif active_screen == "5. My Account":
+    st.title("👤 My Account")
+    st.write(f"**Name:** {USER['full_name']}")
+    st.write(f"**Username:** {USER['username']}  ·  **Email:** {USER['email']}")
+    st.write(f"**Role:** {USER['role']}  ·  **Institution:** {USER.get('institution_name') or '—'}")
+    st.write(f"**Based in:** {USER.get('home_lga') or '—'}, {USER.get('home_state') or '—'}")
+    st.divider()
+
+    st.subheader("🔑 Change password")
+    with st.form("change_pw_form"):
+        old_pw = st.text_input("Current password", type="password")
+        c1, c2 = st.columns(2)
+        new_pw = c1.text_input("New password", type="password")
+        new_pw2 = c2.text_input("Confirm new password", type="password")
+        if st.form_submit_button("Update password"):
+            if new_pw != new_pw2:
+                st.error("New passwords do not match.")
+            else:
+                ok, msg = change_own_password(USER["username"], old_pw, new_pw)
+                st.success(msg) if ok else st.error(msg)
+
+
+# ==============================================================================
+# SCREEN 6: ADMIN CONSOLE (admins only — manage every account)
+# ==============================================================================
+elif active_screen == "6. Admin Console":
+    if USER["role"] != "Admin":
+        st.error("Admins only.")
+        st.stop()
+
+    st.title("🛠️ Admin Console")
+    users = list_users()
+    active_count = int(users["is_active"].sum())
+    st.caption(f"{len(users)} accounts · {active_count} active · {len(users) - active_count} deactivated")
+
+    display = users.copy()
+    display["status"] = display["is_active"].map({1: "✅ Active", 0: "🚫 Disabled"})
+    st.dataframe(display[["username", "full_name", "email", "role",
+                          "institution_name", "home_state", "status", "created_at"]],
+                 use_container_width=True, hide_index=True)
+
+    st.divider()
+    st.subheader("Manage an account")
+    target = st.selectbox("Select user", users["username"].tolist())
+    trow = users[users["username"] == target].iloc[0]
+
+    col_a, col_b = st.columns(2)
+    with col_a:
+        st.markdown("**Role**")
+        new_role = st.selectbox("Set role", ROLES, index=ROLES.index(trow["role"]),
+                                key="admin_role")
+        if st.button("Update role"):
+            if target == USER["username"] and new_role != "Admin":
+                st.error("You cannot remove your own admin rights.")
+            else:
+                set_user_role(target, new_role)
+                st.success(f"{target} is now {new_role}.")
+                st.rerun()
+
+        st.markdown("**Access**")
+        if trow["is_active"]:
+            if st.button("🚫 Deactivate account"):
+                if target == USER["username"]:
+                    st.error("You cannot deactivate your own account.")
+                else:
+                    set_user_active(target, False)
+                    st.success(f"{target} deactivated.")
+                    st.rerun()
+        else:
+            if st.button("✅ Reactivate account"):
+                set_user_active(target, True)
+                st.success(f"{target} reactivated.")
+                st.rerun()
+
+    with col_b:
+        st.markdown("**Reset password**")
+        with st.form("admin_reset_form"):
+            temp_pw = st.text_input("New temporary password", type="password")
+            if st.form_submit_button("Reset password"):
+                if len(temp_pw) < 6:
+                    st.error("Password must be at least 6 characters.")
+                else:
+                    admin_reset_password(target, temp_pw)
+                    st.success(f"Password reset for {target}. Share it securely and "
+                               "ask them to change it from My Account.")
